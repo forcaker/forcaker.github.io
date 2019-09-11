@@ -272,6 +272,169 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/11/SQL注入浅析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="WM">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/11/SQL注入浅析/" itemprop="url">SQL注入浅析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-11T21:24:24+08:00">
+                2019-09-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/09/11/SQL注入浅析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/09/11/SQL注入浅析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/09/11/SQL注入浅析/" class="leancloud_visitors" data-flag-title="SQL注入浅析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="什么是SQL注入？"><a href="#什么是SQL注入？" class="headerlink" title="什么是SQL注入？"></a>什么是SQL注入？</h2><p>​        首先，我们要知道什么是SQL注入，简单来说，就是在输入字符串中嵌入SQL指令，如果在程序设计时忽略了对特殊字符串的检查，这些嵌入的指令便会被误认为正常的SQL指令，在数据库中执行，因此可以对后台数据库进行查看等操作，甚至破坏后台数据库造成严重后果。</p>
+<p>SQL注入大致可以分为普通注入和盲注<br>        普通注入：攻击者通过观察返回的错误提示信息进行注入<br>        盲注：网络上有好多种解释，作为刚入门的小白，我的理解是攻击者能得到的页面只有成功和失败的页面（废话。。。），准确的说失败的页面不会像普通注入那样给你返回有用的错误提示信息，甚至有可能是什么都没有，而且即使成功了也不会显示我们想要的数据，这就需要我们一步一步的去猜。那么，如何知道我们的注入语句是成功的还是失败的呢？一般情况是通过页面的响应时间来进行判断，如果说我们构造的语句是错误的，那么页面会在极短的时间内响应完毕，如果正确的话，那么我们的页面的响应时间就会稍长一些。</p>
+<h2 id="入门级SQL注入过程（sqli-labs靶场练习）"><a href="#入门级SQL注入过程（sqli-labs靶场练习）" class="headerlink" title="入门级SQL注入过程（sqli-labs靶场练习）"></a>入门级SQL注入过程（sqli-labs靶场练习）</h2><ol>
+<li><p>寻找注入点<br>那么我们该如何寻找注入点呢？<br>  传统的SQL语句可控参数分为两类：<br>   1.数字类型参数不用被引号扩起来，如?id=1<br>   2.其他类型，参数要被引号括起来，如?name=”phone”<br>   判断某个链接是否存在SQL注入，可以对传入的可控参数进行简单构造，通过服务端返回的内容判断有无注入<br>   以靶场sqli-labs为例</p>
+<p><img src="/.com//2.png" alt="avatar"></p>
+<p>可以看到当我们在页面请求里构造?id=1 and 1=2后</p>
+<pre><code>此时返回页面正常，这说明了什么？说明了此处不是数字型注入漏洞，为什么这么说呢？因为我们在?id=1后面加上的那句and1=2,既然是and，那么一假一真为假，如果是数字型注入漏洞的话就会报错，而回显却没问题，那么就可以排除是数字型注入漏洞。而当我们在?id=1之后加上一个&apos;，再看</code></pre><p><img src="/.com//3.png" alt="avatar"></p>
+<p>​        此时页面回显不正常，提示我们SQL语法错误，这说明什么？说明我们的语句已经被执行了，但是由于语法不正确，所以报错。语句被执行，那么就说明此处可能存在字符型的注入，那么我们再加一把火，在页面请求的后面在加上一条注释  –+（注：–空格在SQL里表示注释，但是浏览器在发送请求时将末尾的空格舍去，所以我们用+来代替空格，因为+在经过URL编码后会变为空格。）</p>
+<p><img src="/.com//4.png" alt="avatar"></p>
+<p>​        此时页面回显正常，可以确定此处存在单引号字符型注入漏洞。知道了是单引号字符型注入漏洞，那我们接下来就可以构造语句语句一步一步的接近我们想要接近的数据，构造order by语句来测试所在表有几个字段，如图所示，为3时正常，为4时出错，说明表有三个字段</p>
+</li>
+</ol>
+<p>​       那么，知道了有三个字段后便可以使用union联合查询来测试页面是否存在显示位，语句如下：union select 5,6,7 –+</p>
+<p><img src="/.com//5.png" alt="avatar"></p>
+<p>​          发现页面输出了6和7，说明有两个显示位，那么接下来，就可以利用SQL语句依次爆破出数据库名，表名，列名，字段信息等<br> <a href="http://localhost/sqli-labs/Less-1/?id=861&#39;" target="_blank" rel="noopener">http://localhost/sqli-labs/Less-1/?id=861&#39;</a> union select 1,(select group_concat(schema_name) from information_schema.schemata),3 –+//查询数据库名</p>
+<p><img src="/.com//6.png" alt="avatar"></p>
+<p>查询security内的表：<a href="http://127.0.0.1/sqli-labs/Less-1/?id=861&#39;" target="_blank" rel="noopener">http://127.0.0.1/sqli-labs/Less-1/?id=861&#39;</a> union select 1,(select group_concat(schema_name) from information_schema.schemata),(select group_concat(table_name) from information_schema.tables where table_schema=’security’) –+</p>
+<p><img src="/.com//7.png" alt></p>
+<p>接着继续爆破出列名：select group_concat(column_name) from information_schema.columns where table_name=’users’</p>
+<p><img src="/.com//8.png" alt="avatar"></p>
+<p>  最后就是激动人心的时刻，直接爆破出用户名和密码：select group_concat(username) from security.users // 用户名<br>  lesect group_concat(password) from security.users//用户密码</p>
+<p><img src="/.com//9.png" alt="avatar"></p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>​        今天就暂时给大家分享这么多，因为白凡也是小白一个，也在学习的路途中，如果有哪些地方有误，请联系我改正，下一篇的话可能会讲一下sqlmap的使用方法，下页见！<br> <a href="https://blog.csdn.net/sdb5858874/article/details/80727555" target="_blank" rel="noopener">参考链接</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/09/test/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -364,8 +527,8 @@
       
         
           
-            <h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p> 自己开始工作之后，总想写点什么，给有缘看到的人分享分享，说不定有的东西就用的上呢？就算没有帮上忙，就当是记录一下自己的工作，学习的过程。</p>
-<h2 id="自述"><a href="#自述" class="headerlink" title="自述"></a>自述</h2><p>严格来说，白凡的一页书并不能算是技术性的博文，作为刚刚开始上班，从事网络安全相关工作的大学生，我会在一页书中分享在工作中所遇到的某些问题，以及解决办法，或者是一些关于网络安全的一些心得体会，一周可能会更新两篇博文左右，所以，我们下一页见。</p>
+            <h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>​       自己开始工作之后，总想写点什么，给有缘看到的人分享分享，说不定有的东西就用的上呢？就算没有帮上忙，就当是记录一下自己的工作，学习的过程。</p>
+<h2 id="自述"><a href="#自述" class="headerlink" title="自述"></a>自述</h2><p>​        严格来说，白凡的一页书并不能算是技术性的博文，作为刚刚开始上班，从事网络安全相关工作的大学生，我会在一页书中分享在工作中所遇到的某些问题，以及解决办法，或者是一些关于网络安全的一些心得体会，一周可能会更新两篇博文左右，所以，我们下一页见。</p>
 
           
         
@@ -447,7 +610,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
